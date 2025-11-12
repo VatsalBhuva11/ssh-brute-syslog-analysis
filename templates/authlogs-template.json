@@ -1,0 +1,66 @@
+{
+    "index_patterns": [
+        "authlogs*"
+    ],
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.refresh_interval": "5s"
+    },
+    "mappings": {
+        "properties": {
+            "@timestamp": {
+                "type": "date"
+            },
+            "timestamp": {
+                "type": "keyword"
+            },
+            "host": {
+                "type": "keyword"
+            },
+            "service": {
+                "type": "keyword"
+            },
+            "pid": {
+                "type": "integer"
+            },
+            "event": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "status": {
+                "type": "keyword"
+            },
+            "user": {
+                "type": "keyword"
+            },
+            "src_ip": {
+                "type": "ip"
+            },
+            "port": {
+                "type": "integer"
+            },
+            "protocol": {
+                "type": "keyword"
+            },
+            "severity": {
+                "type": "keyword"
+            },
+            "message": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "tags": {
+                "type": "keyword"
+            }
+        }
+    }
+}

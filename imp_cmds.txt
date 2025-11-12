@@ -1,0 +1,55 @@
+# Important Commands for ELK Stack SSH Log Analysis
+
+## Quick Start
+docker compose up -d
+./scripts/health_check.sh
+
+## Health & Status Checks
+./scripts/health_check.sh                    # Comprehensive health check
+curl http://localhost:9200/_cluster/health?pretty  # ES cluster status
+curl http://localhost:9200/authlogs/_count?pretty   # Document count
+./scripts/monitor.sh                         # Real-time monitoring
+
+## View Logs
+./scripts/view_logs.sh                       # All services
+./scripts/view_logs.sh logstash 200          # Logstash only (200 lines)
+./scripts/view_logs.sh elasticsearch         # Elasticsearch only
+./scripts/view_logs.sh kibana                # Kibana only
+docker compose logs -f logstash               # Follow Logstash logs
+
+## Query Elasticsearch
+./scripts/query_elasticsearch.sh count       # Total document count
+./scripts/query_elasticsearch.sh failed 20   # Show 20 failed attempts
+./scripts/query_elasticsearch.sh top-ips 10  # Top 10 attacking IPs (uses src_ip.keyword)
+./scripts/query_elasticsearch.sh top-users 10 # Top 10 targeted users
+./scripts/query_elasticsearch.sh recent 5   # 5 most recent events
+./scripts/query_elasticsearch.sh stats      # Overall statistics
+
+# Note: For aggregations, use .keyword suffix (e.g., src_ip.keyword, status.keyword)
+
+## Add Test Data
+./gen_fake_ssh_attacks.sh 100                # Generate 100 fake attacks
+echo 'Oct 31 12:55:01 arch sshd[3333]: Failed password for invalid user root from 10.0.0.7 port 22 ssh2' | sudo tee -a auth.log
+
+## Reset & Maintenance
+./scripts/reset_stack.sh                    # Reset everything (WARNING: deletes data)
+docker compose down -v                       # Stop and remove volumes
+docker compose restart logstash              # Restart Logstash only
+
+## Kibana Access
+http://localhost:5601
+- Discover tab → Create data view
+- Index pattern: authlogs*
+- Time field: @timestamp
+
+## Elasticsearch API
+curl http://localhost:9200/_cat/indices?           # List all indices
+curl http://localhost:9200/_cat/shards/authlogs?  # Shard status
+curl -X PUT 'http://localhost:9200/authlogs/_settings' -H 'Content-Type: application/json' -d '{"index":{"number_of_replicas":"0"}}'  # Fix yellow status
+
+## Useful Queries
+# Failed logins in last hour
+curl -X POST "http://localhost:9200/authlogs/_search?pretty" -H 'Content-Type: application/json' -d '{"query":{"bool":{"must":[{"term":{"status":"Failed"}},{"range":{"@timestamp":{"gte":"now-1h"}}}]}}}'
+
+# Top IPs with failed attempts
+curl -X POST "http://localhost:9200/authlogs/_search?pretty" -H 'Content-Type: application/json' -d '{"size":0,"query":{"term":{"status":"Failed"}},"aggs":{"top_ips":{"terms":{"field":"src_ip","size":10}}}}'
