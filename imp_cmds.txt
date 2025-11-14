@@ -49,7 +49,28 @@ curl -X PUT 'http://localhost:9200/authlogs/_settings' -H 'Content-Type: applica
 
 ## Useful Queries
 # Failed logins in last hour
-curl -X POST "http://localhost:9200/authlogs/_search?pretty" -H 'Content-Type: application/json' -d '{"query":{"bool":{"must":[{"term":{"status":"Failed"}},{"range":{"@timestamp":{"gte":"now-1h"}}}]}}}'
+curl -X POST "http://localhost:9200/authlogs/_search?pretty" -H 'Content-Type: application/json' -d '{"query":{"bool":{"must":[{"term":{"status.keyword":"Failed"}},{"range":{"@timestamp":{"gte":"now-1h"}}}]}}}'
 
 # Top IPs with failed attempts
-curl -X POST "http://localhost:9200/authlogs/_search?pretty" -H 'Content-Type: application/json' -d '{"size":0,"query":{"term":{"status":"Failed"}},"aggs":{"top_ips":{"terms":{"field":"src_ip","size":10}}}}'
+curl -X POST "http://localhost:9200/authlogs/_search?pretty" -H 'Content-Type: application/json' -d '{"size":0,"query":{"term":{"status.keyword":"Failed"}},"aggs":{"top_ips":{"terms":{"field":"src_ip.keyword","size":10}}}}'
+
+## Create Forensic Evidence (E01 Format)
+./scripts/create_evidence.sh                    # Create E01 evidence file (requires libewf)
+./scripts/create_evidence.sh ./output case_001  # Specify output dir and case name
+./scripts/extract_evidence.sh evidence.E01       # Extract evidence from E01 (handles padding)
+./scripts/examine_evidence.sh evidence.E01       # Mount and examine E01 (interactive)
+ewfverify evidence.E01                          # Basic E01 verification (may show false failures)
+
+# Manual E01 operations (requires sudo)
+./scripts/examine_evidence.sh evidence.E01      # Mount and examine E01 (recommended, interactive)
+
+# Manual mounting and extraction:
+sudo mkdir -p /tmp/ewf_mount                    # Create mount point
+sudo ewfmount -f files -o nonempty evidence.E01 /tmp/ewf_mount  # Mount E01 (use -f files since created that way)
+# Note: ewfmount creates ewf1 file (not evidence.tar.gz directly)
+sudo cp /tmp/ewf_mount/ewf1 /tmp/evidence.tar.gz  # Copy ewf1 (it IS the tar.gz file)
+tar -xzf /tmp/evidence.tar.gz                    # Extract evidence
+sudo umount /tmp/ewf_mount                      # Unmount when done
+
+# If extraction fails with "unexpected end of file", try different sizes:
+for size in 6354 6451 6500; do sudo dd if=/tmp/ewf_mount/ewf1 bs=1 count=$size of=/tmp/test.tar.gz && tar -tzf /tmp/test.tar.gz && break; done

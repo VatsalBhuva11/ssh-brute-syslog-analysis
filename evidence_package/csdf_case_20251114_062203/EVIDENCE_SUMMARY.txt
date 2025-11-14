@@ -1,0 +1,20 @@
+Evidence Summary Report
+=======================
+Case: csdf_case_20251114_062203
+Date: Fri Nov 14 06:22:04 AM +03 2025
+
+File Statistics:
+1.1K ./home/vb11x/Downloads/csdf-project/gen_fake_ssh_attacks.sh
+0 ./EVIDENCE_SUMMARY.txt
+388 ./HASHES.txt
+1.3K ./CASE_METADATA.txt
+48K ./var/log/auth.log
+1.1K ./etc/docker-compose.yml
+2.0K ./etc/logstash.conf
+
+Log Analysis (if auth.log exists):
+Total lines: 488
+Failed login attempts: 436
+Successful logins: 10
+Unique source IPs: 201
+
