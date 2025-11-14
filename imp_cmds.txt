@@ -3,6 +3,7 @@
 ## Quick Start
 docker compose up -d
 ./scripts/health_check.sh
+sudo truncate -s 0 /var/log/auth.log # to clear auth.log
 
 ## Health & Status Checks
 ./scripts/health_check.sh                    # Comprehensive health check

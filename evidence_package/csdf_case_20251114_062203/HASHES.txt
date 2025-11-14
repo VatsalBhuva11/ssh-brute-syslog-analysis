@@ -1,4 +1,0 @@
-e8793ccbd523bd2038e28d72892298efd51ef911644b91d9c554cd98098d0db1  ./home/vb11x/Downloads/csdf-project/gen_fake_ssh_attacks.sh
-fcab41d8266cb664e7b8851d3de3c6ca2bbd348eba3429ad6ace7692d2a0051a  ./var/log/auth.log
-67de57a6adda0b29eba207f2164488b22d5a93511e74e1c8dfaa6be2d3583058  ./etc/docker-compose.yml
-8f3adcf4616d9f7a25adb87347a27d47424c8b05abe0b51ccd68e8e38cfb5891  ./etc/logstash.conf

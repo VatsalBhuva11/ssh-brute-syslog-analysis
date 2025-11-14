@@ -1,5 +1,18 @@
 # Changelog
 
+# Changelog
+
+## [GeoIP & Ingestion Improvements] - 2025-11-14
+
+### Added
+- GeoIP enrichment in `logstash.conf` for public source IPs (skips private/reserved ranges) with latitude/longitude conversion.
+- Optional sudo-drop filter to keep auth logs focused on SSH activity.
+- README instructions for enabling/updating GeoIP data and building Kibana map visualizations.
+
+### Improved
+- Logstash file input now tails from the end and persists its sincedb pointer (`/usr/share/logstash/data/sincedb`) to prevent duplicate documents after restarts.
+- `docker-compose.yml` mounts the Logstash data directory so the sincedb file survives container rebuilds.
+
 ## [Enhanced] - 2025-10-31
 
 ### Added

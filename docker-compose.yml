@@ -29,7 +29,9 @@ services:
     user: "0:0"
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-      - ./auth.log:/var/log/auth.log:ro
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - logstash_data:/usr/share/logstash/data # Persist sincedb and other data
 
 volumes:
   esdata:
+  logstash_data:

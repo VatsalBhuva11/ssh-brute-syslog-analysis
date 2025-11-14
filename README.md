@@ -177,12 +177,28 @@ After creating the data view, you can:
 
 ## Advanced Configuration
 
-### Enable GeoIP
+### GeoIP Enrichment & Maps
 
-GeoIP is available in Logstash but requires the GeoIP database. To enable:
-1. Download GeoLite2 database
-2. Mount it in docker-compose.yml
-3. Update logstash.conf to use GeoIP filter
+- GeoIP lookups are **enabled by default** for public source IPs (`src_ip` field).  
+  Private/reserved ranges (10.x, 172.16/12, 192.168.x, 127.x, etc.) are skipped automatically.
+- Logstash enriches each event with the `geoip.*` fields (latitude, longitude, country, city, ASN, etc.).
+- Kibana can use `geoip.location` to plot events on a map.
+
+#### Updating the GeoIP database (optional)
+The Logstash GeoIP plugin ships with a bundled database. To use the latest MaxMind GeoLite2 data:
+1. Create a `geoip/` folder in this project.
+2. Download `GeoLite2-City.mmdb` from MaxMind (requires a free account) into `geoip/`.
+3. Update `docker-compose.yml` to mount that directory: `./geoip:/usr/share/logstash/geoip:ro`.
+4. Set `database => "/usr/share/logstash/geoip/GeoLite2-City.mmdb"` inside the Logstash `geoip` filter (if you need the custom path).
+
+#### Build a Kibana map (geo heatmap)
+1. Open **Kibana → Maps** → “Create map”.
+2. Add a **Documents** layer using the `authlogs*` data view.
+3. Set the **geospatial field** to `geoip.location`.
+4. Style by:
+   - Size or color using `failed_login` tag (failed vs. accepted).
+   - Time filter (e.g., last 24h) to watch attack bursts.
+5. Save the map or embed it into your dashboard for quick situational awareness.
 
 ### Adjust Logstash Parsing
 
